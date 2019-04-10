@@ -73,6 +73,7 @@ where
     S: BuildHasher,
 {
     /// Construct a basic TrashMap
+    #[inline]
     pub fn new() -> Self
     where
         S: Default,
@@ -85,6 +86,7 @@ where
     }
 
     /// Construct a TrashMap with a custom hasher and/or capacity
+    #[inline]
     pub fn with_capacity_and_hasher(cap: usize, hasher: S) -> Self {
         Self {
             hasher,
@@ -94,6 +96,7 @@ where
     }
 
     /// Inserts a key-value pair, returning the `Trash` id for the entry
+    #[inline]
     pub fn insert<Q: ?Sized>(&mut self, k: &Q, v: V) -> Trash
     where
         K: Borrow<Q>,
@@ -107,6 +110,7 @@ where
     /// Inserts a key-value pair, using the `Trash` id for the key
     ///
     /// Returns the old value if present
+    #[inline]
     pub fn insert_id(&mut self, k: Trash, v: V) -> Option<V>
     {
         self.map.insert(k, v)
@@ -114,6 +118,7 @@ where
 
     /// Inserts a key-value pair, returning the `Trash` id for the entry as well
     /// as the old entry, if present
+    #[inline]
     pub fn insert_replace<Q: ?Sized>(&mut self, k: &Q, v: V) -> (Trash, Option<V>)
     where
         K: Borrow<Q>,
@@ -124,11 +129,13 @@ where
     }
 
     /// Gets the entry corresponding to a given `Trash` id, if present
+    #[inline]
     pub fn get(&self, key: Trash) -> Option<&V> {
         self.map.get(&key)
     }
 
     /// Gets the entry corresponding to a given key, if present.
+    #[inline]
     pub fn get_key<Q: ?Sized>(&self, key: &Q) -> Option<&V>
     where
         K: Borrow<Q>,
@@ -140,10 +147,13 @@ where
 
     /// Removes and returns the entry corresponding to a given `Trash` id,
     /// if present
+    #[inline]
     pub fn remove(&mut self, key: Trash) -> Option<V> {
         self.map.remove(&key)
     }
 
+    /// Removes and returns an entry corresponding to a given key
+    #[inline]
     pub fn remove_key<Q: ?Sized>(&mut self, key: &Q) -> Option<V>
     where
         K: Borrow<Q>,
@@ -154,6 +164,7 @@ where
     }
 
     /// Get the `Trash` id for a given key
+    #[inline]
     pub fn trash<Q: ?Sized>(&self, k: &Q) -> Trash
     where
         K: Borrow<Q>,
@@ -235,6 +246,7 @@ where
     S: BuildHasher,
 {
     /// Construct a basic TrashSet
+    #[inline]
     pub fn new() -> Self
     where
         S: Default,
@@ -247,6 +259,7 @@ where
     }
 
     /// Construct a TrashSet with a custom hasher and/or capacity
+    #[inline]
     pub fn with_capacity_and_hasher(cap: usize, hasher: S) -> Self {
         Self {
             hasher,
@@ -256,6 +269,7 @@ where
     }
 
     /// Insert a key, getting a `Trash` id to be used to access the entry later
+    #[inline]
     pub fn insert<Q: ?Sized>(&mut self, key: &Q) -> Trash
     where
         K: Borrow<Q>,
@@ -268,6 +282,7 @@ where
 
     /// Insert a key, getting a `Trash` id to be used to access the entry later,
     /// as well as a boolean indicating if the key was already in the map
+    #[inline]
     pub fn insert_check<Q: ?Sized>(&mut self, key: &Q) -> (Trash, bool)
     where
         K: Borrow<Q>,
@@ -280,12 +295,14 @@ where
     /// Insert an element based on its `Trash` id
     ///
     /// Returns whether or not a key was present
+    #[inline]
     pub fn insert_id(&mut self, key: Trash) -> bool
     {
         self.set.insert(key)
     }
 
     /// Check if the `Trash` id has been inserted before
+    #[inline]
     pub fn contains(&self, key: Trash) -> bool {
         self.set.contains(&key)
     }
@@ -293,6 +310,7 @@ where
     /// Check if the key has been inserted before
     ///
     /// Also returns the `Trash` id for the key
+    #[inline]
     pub fn contains_key<Q: ?Sized>(&self, key: &Q) -> bool
     where
         K: Borrow<Q>,
@@ -303,11 +321,13 @@ where
     }
 
     /// Remove an entry based on its `Trash` id
+    #[inline]
     pub fn remove(&mut self, key: Trash) -> bool {
         self.set.remove(&key)
     }
 
     /// Remove an entry given its key
+    #[inline]
     pub fn remove_key<Q: ?Sized>(&mut self, key: &Q) -> bool
     where
         K: Borrow<Q>,
@@ -317,6 +337,7 @@ where
     }
 
     /// Get the `Trash` id for a given key
+    #[inline]
     pub fn trash<Q: ?Sized>(&self, k: &Q) -> Trash
     where
         K: Borrow<Q>,
