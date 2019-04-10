@@ -1,6 +1,6 @@
 [package]
 name = "trashmap"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Manish Goregaokar <manishsmail@gmail.com>"]
 license = "MIT/Apache-2.0"
 edition = "2018"
