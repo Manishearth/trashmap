@@ -207,7 +207,7 @@ where
     }
 }
 
-impl<K, V, S> Default for TrashMap<K, V, S>
+impl<K: ?Sized, V, S> Default for TrashMap<K, V, S>
 where
     K: Eq + Hash,
     S: BuildHasher + Default,
@@ -380,7 +380,7 @@ where
     }
 }
 
-impl<K, S> Default for TrashSet<K, S>
+impl<K: ?Sized, S> Default for TrashSet<K, S>
 where
     K: Eq + Hash,
     S: BuildHasher + Default,
