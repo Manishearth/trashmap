@@ -222,8 +222,8 @@ where
 ///
 /// impl State {
 ///     fn step_into(&mut self, entry: &str) {
-///         let (id, contains) = self.seen.insert_check(entry);
-///         if contains {
+///         let (id, empty) = self.seen.insert_check(entry);
+///         if !empty {
 ///             panic!("found recursive loop!");
 ///         }
 ///         let children = lookup_children(entry);
@@ -281,7 +281,7 @@ where
     }
 
     /// Insert a key, getting a `Trash` id to be used to access the entry later,
-    /// as well as a boolean indicating if the key was already in the map
+    /// as well as a boolean indicating if the entry was empty (true if empty, false otherwise)
     #[inline]
     pub fn insert_check<Q: ?Sized>(&mut self, key: &Q) -> (Trash, bool)
     where
@@ -294,7 +294,7 @@ where
 
     /// Insert an element based on its `Trash` id
     ///
-    /// Returns whether or not a key was present
+    /// Returns whether or not the entry was previously unset (true if unset, false otherwise)
     #[inline]
     pub fn insert_id(&mut self, key: Trash) -> bool
     {
