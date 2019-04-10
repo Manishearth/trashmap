@@ -84,7 +84,7 @@ where
         }
     }
 
-    /// Construct a basic trashmap with a custom hasher and/or capacity
+    /// Construct a TrashMap with a custom hasher and/or capacity
     pub fn with_capacity_and_hasher(cap: usize, hasher: S) -> Self {
         Self {
             hasher,
@@ -105,9 +105,11 @@ where
     }
 
     /// Inserts a key-value pair, using the `Trash` id for the key
-    pub fn insert_id(&mut self, k: Trash, v: V)
+    ///
+    /// Returns the old value if present
+    pub fn insert_id(&mut self, k: Trash, v: V) -> Option<V>
     {
-        self.map.insert(k, v);
+        self.map.insert(k, v)
     }
 
     /// Inserts a key-value pair, returning the `Trash` id for the entry as well
@@ -127,14 +129,13 @@ where
     }
 
     /// Gets the entry corresponding to a given key, if present.
-    /// Also returns the `Trash` id of the key to avoid recomputation
-    pub fn get_key<Q: ?Sized>(&self, key: &Q) -> (Option<&V>, Trash)
+    pub fn get_key<Q: ?Sized>(&self, key: &Q) -> Option<&V>
     where
         K: Borrow<Q>,
         Q: Hash + Eq,
     {
         let trash = self.trash(key);
-        (self.map.get(&trash), trash)
+        self.map.get(&trash)
     }
 
     /// Removes and returns the entry corresponding to a given `Trash` id,
@@ -143,16 +144,17 @@ where
         self.map.remove(&key)
     }
 
-    pub fn remove_key<Q: ?Sized>(&mut self, key: &Q) -> (Option<V>, Trash)
+    pub fn remove_key<Q: ?Sized>(&mut self, key: &Q) -> Option<V>
     where
         K: Borrow<Q>,
         Q: Hash + Eq,
     {
         let trash = self.trash(key);
-        (self.map.remove(&trash), trash)
+        self.map.remove(&trash)
     }
 
-    fn trash<Q: ?Sized>(&self, k: &Q) -> Trash
+    /// Get the `Trash` id for a given key
+    pub fn trash<Q: ?Sized>(&self, k: &Q) -> Trash
     where
         K: Borrow<Q>,
         Q: Hash + Eq,
@@ -209,11 +211,10 @@ where
 ///
 /// impl State {
 ///     fn step_into(&mut self, entry: &str) {
-///         let (contains, id) = self.seen.contains_key(entry);
+///         let (id, contains) = self.seen.insert_check(entry);
 ///         if contains {
 ///             panic!("found recursive loop!");
 ///         }
-///         self.seen.insert_id(id);
 ///         let children = lookup_children(entry);
 ///         for child in children {
 ///            self.step_into(child);
@@ -233,6 +234,7 @@ where
     K: Eq + Hash,
     S: BuildHasher,
 {
+    /// Construct a basic TrashSet
     pub fn new() -> Self
     where
         S: Default,
@@ -244,6 +246,7 @@ where
         }
     }
 
+    /// Construct a TrashSet with a custom hasher and/or capacity
     pub fn with_capacity_and_hasher(cap: usize, hasher: S) -> Self {
         Self {
             hasher,
@@ -263,10 +266,23 @@ where
         trash
     }
 
-    /// Insert an element based on its `Trash` id
-    pub fn insert_id(&mut self, key: Trash)
+    /// Insert a key, getting a `Trash` id to be used to access the entry later,
+    /// as well as a boolean indicating if the key was already in the map
+    pub fn insert_check<Q: ?Sized>(&mut self, key: &Q) -> (Trash, bool)
+    where
+        K: Borrow<Q>,
+        Q: Hash + Eq,
     {
-        self.set.insert(key);
+        let trash = self.trash(key);
+        (trash, self.set.insert(trash))
+    }
+
+    /// Insert an element based on its `Trash` id
+    ///
+    /// Returns whether or not a key was present
+    pub fn insert_id(&mut self, key: Trash) -> bool
+    {
+        self.set.insert(key)
     }
 
     /// Check if the `Trash` id has been inserted before
@@ -277,13 +293,13 @@ where
     /// Check if the key has been inserted before
     ///
     /// Also returns the `Trash` id for the key
-    pub fn contains_key<Q: ?Sized>(&self, key: &Q) -> (bool, Trash)
+    pub fn contains_key<Q: ?Sized>(&self, key: &Q) -> bool
     where
         K: Borrow<Q>,
         Q: Hash + Eq,
     {
         let trash = self.trash(key);
-        (self.set.contains(&trash), trash)
+        self.set.contains(&trash)
     }
 
     /// Remove an entry based on its `Trash` id
@@ -291,7 +307,7 @@ where
         self.set.remove(&key)
     }
 
-    /// Remove a key
+    /// Remove an entry given its key
     pub fn remove_key<Q: ?Sized>(&mut self, key: &Q) -> bool
     where
         K: Borrow<Q>,
@@ -300,7 +316,8 @@ where
         self.set.remove(&self.trash(key))
     }
 
-    fn trash<Q: ?Sized>(&self, k: &Q) -> Trash
+    /// Get the `Trash` id for a given key
+    pub fn trash<Q: ?Sized>(&self, k: &Q) -> Trash
     where
         K: Borrow<Q>,
         Q: Hash + Eq,
