@@ -1,3 +1,34 @@
+//! This crate provides `TrashMap` and `TrashSet` types, which allow you to directly use the key
+//! hash to operate with your entries. This is typically useful for when it's cheap to hold on to
+//! the hash value (e.g. within a single stack frame) and you don't want to incur the cost of
+//! rehashing on each access (but you can't use `Entry` as the map may change in the process)
+//!
+//! The `Trash` type is used to represent computed hashes, lookups via `Trash` are cheap.
+//! 
+//! An example of using this would be to check for cycles when doing some kind of graph traversal:
+//!
+//! ```rust
+//! use trashmap::TrashSet;
+//! # fn lookup_children(entry: &str) -> &'static [&'static str] { &[] }
+//! struct State {
+//!    seen: TrashSet<str>,
+//! }
+//!
+//! impl State {
+//!     fn step_into(&mut self, entry: &str) {
+//!         let (id, empty) = self.seen.insert_check(entry);
+//!         if !empty {
+//!             panic!("found recursive loop!");
+//!         }
+//!         let children = lookup_children(entry);
+//!         for child in children {
+//!            self.step_into(child);
+//!         }
+//!         self.seen.remove(id);
+//!     }
+//! }
+//! ```
+//!
 use std::borrow::Borrow;
 use std::collections::{hash_map::RandomState, HashMap, HashSet};
 use std::hash::{BuildHasher, BuildHasherDefault, Hash, Hasher};
@@ -230,8 +261,8 @@ where
 ///         for child in children {
 ///            self.step_into(child);
 ///         }
-///         self.seen.remove(id);  
-///     }  
+///         self.seen.remove(id);
+///     }
 /// }
 /// ```
 pub struct TrashSet<K: ?Sized, S = RandomState> {
