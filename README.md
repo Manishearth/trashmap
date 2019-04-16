@@ -1,4 +1,4 @@
-## elsa
+## trashmap
 
 [![Build Status](https://travis-ci.org/Manishearth/trashmap.svg?branch=master)](https://travis-ci.org/Manishearth/trashmap)
 [![Current Version](https://meritbadge.herokuapp.com/trashmap)](https://crates.io/crates/trashmap)
