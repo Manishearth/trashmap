@@ -1,11 +1,13 @@
 [package]
 name = "trashmap"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Manish Goregaokar <manishsmail@gmail.com>"]
 license = "MIT/Apache-2.0"
 edition = "2018"
 description = "A HashMap and HashSet that operate directly on hashes instead of keys, avoiding rehashing"
 documentation = "https://docs.rs/trashmap/"
 repository = "https://github.com/manishearth/trashmap"
+keywords = ["map", "hash", "cache", "data-structure"]
+categories = ["data-structures", "caching"]
 
 [dependencies]
